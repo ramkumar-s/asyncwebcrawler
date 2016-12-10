@@ -1,0 +1,22 @@
+{
+  "name": "asyncwebcrawler",
+  "version": "1.0.0",
+  "description": "nodejs script to recursively crawl a given domain for hyperlinks and write them to a csv file",
+  "main": "asyncwebcrawler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "async",
+    "webcrawler",
+    "nodejs"
+  ],
+  "author": "ramkumar seetharaman",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.1.4",
+    "cheerio": "^0.22.0",
+    "csv-write-stream": "^2.0.0",
+    "request": "^2.79.0"
+  }
+}
