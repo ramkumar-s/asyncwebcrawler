@@ -3,7 +3,7 @@ var cheerio = require('cheerio');
 var csvWriter = require('csv-write-stream');
 var fs = require('fs');
 var async = require('async');
-console.log(process.argv);
+
 var domainurl = process.argv[2].toString();
 var csvfile = process.argv[3];
 var urlholder = {};
