@@ -7,12 +7,22 @@ To install dependencies, use:
 npm install
 ```
 
-To run script, use:
+To run script with `async` library, use:
 ```
-node asyncwebcrawler.js <silte url> <csv file> 
+node asyncwebcrawler.js <site url> <csv file> 
 ```
 
 Example:
 ```
 node asyncwebcrawler.js https://www.google.com hyperlinks.csv
+```
+
+To run script without `async` library, use:
+```
+node basicnodewebcrawler.js <site url> <csv file> 
+```
+
+Example:
+```
+node basicnodewebcrawler.js https://www.google.com hyperlinks.csv
 ```

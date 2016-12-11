@@ -2,10 +2,10 @@ var request = require('request');
 var cheerio = require('cheerio');
 var csvWriter = require('csv-write-stream');
 var fs = require('fs');
-var async = require('async');
 
 var domainurl = process.argv[2].toString();
 var csvfile = process.argv[3];
+
 /*  
     Object that holds all domain urls.
     Value of 1 represents that this url has not been accessed yet.
@@ -19,7 +19,85 @@ writer.pipe(fs.createWriteStream(csvfile));
 /*
     Variable used to check whether all urls inside urholder have accessed.
 */
-urlholder[domainurl] = 1;
+var flag;
+
+/*
+    Function used to execute callback on array elements while keeping current execution count to specified limit.
+*/
+function executeOnArray(limit) {
+    return function (obj, taskfunction, callback) {
+        if (limit <= 0 || !obj) {
+            return callback(null);
+        }
+        var nextElem = returnIterator(obj);
+        /*
+            Flags used to check running callbacks
+        */
+        var done = false;
+        var running = 0; 
+        
+        /*
+            Function that calls specified callback and sets the flags
+        */
+        function taskCallback(err, value) {
+            running -= 1;
+            if (err) {
+                done = true;
+                callback(err);
+            } else if (value === {} || done && running <= 0) {
+                done = true;
+                return callback(null);
+            } else {
+                refillExecQ();
+            }
+        }
+
+        /*
+            Function that checks if running callback limit is reached.
+            If not reached, it calls given callback.
+        */
+        function refillExecQ() {
+            while (running < limit && !done) {
+                var elem = nextElem();
+                if (elem === null) {
+                    done = true;
+                    if (running <= 0) {
+                        callback(null);
+                    }
+                    return;
+                }
+                running += 1;
+                taskfunction(elem.value, onlyOnce(taskCallback));
+            }
+        }
+
+        refillExecQ();
+    };
+}
+
+/*
+    Function that converts array to iterator.
+*/
+function returnIterator(coll) {
+    var i = -1;
+    var len = coll.length;
+    return function next() {
+        return ++i < len ? { value: coll[i], key: i } : null;
+    };
+}
+
+/*
+    Function that ensures callback is called only once.
+*/
+
+function onlyOnce(func) {
+    return function () {
+        if (func === null) throw new Error("Callback was already called.");
+        var taskFunc = func;
+        func = null;
+        taskFunc.apply(this, arguments);
+    };
+}
 
 function crawl() {
     flag = 1;
@@ -37,9 +115,8 @@ function crawl() {
     /*
         Iterating over urllist with async having set max number of operations to 5
     */
-    async.forEachLimit(
+    executeOnArray(5)(
         urllist,
-        5,
         function (url, callback) {
             urlholder[url] = 0;
             /*
