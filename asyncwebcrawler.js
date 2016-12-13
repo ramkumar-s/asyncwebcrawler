@@ -19,7 +19,7 @@ writer.pipe(fs.createWriteStream(csvfile));
 /*
     Variable used to check whether all urls inside urholder have accessed.
 */
-urlholder[domainurl] = 1;
+var flag;
 
 function crawl() {
     flag = 1;
